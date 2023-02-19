@@ -1,0 +1,58 @@
+clc;
+close all;
+C=[-1 -3 0 0];  
+A=[2 3 -1 0 ;-1 1 0 -1];
+b=[6;1];
+
+m = size(A,1);
+n = size(A,2);
+
+
+pair = nchoosek(1:n,m);
+
+bfs = [];
+not_bfs = [];
+
+flag = true;
+
+for i = 1:length(pair)
+    currentSolution = zeros(length(A),1);
+    B = A(:,pair(i,:));
+    if det(B)==0
+        fprintf("Not a Basic Solution\n")
+    else
+        x = B\b;
+        if all(x>=0 & x~=-Inf & x~=Inf)
+            currentSolution(pair(i,:))=x;
+            bfs = [bfs currentSolution];
+
+            if any(x==0)
+                flag = false;
+            end
+        else
+            currentSolution(pair(i,:))=x;
+            not_bfs = [not_bfs currentSolution];
+        end
+    end
+end
+fprintf("Basic Infeasible Solutions: \n");
+disp(not_bfs);
+
+if ~isempty(bfs)
+    fprintf("Basic Feasible Solutions: \n")
+    disp(bfs);
+
+    if ~flag
+        fprintf("Degenerate B.F.S\n")
+    else
+        fprintf("Non-Degenerate B.F.S\n")
+    end
+    fprintf("Optimal Solution:\n")
+
+    z = C*bfs;
+
+    [maxz , max_ind] = max(z);
+
+    disp(bfs(:,max_ind));
+end
+
