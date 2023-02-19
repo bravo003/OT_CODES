@@ -1,0 +1,29 @@
+clc;
+close all;
+
+A = [1 2;1 1;0 1];
+b = [2000;1500;600];
+c = [3 5];
+
+ineq = [0 0 1];
+
+[m,n] = size(A);
+
+s=eye(m);
+index = find(ineq==1);
+s(index,:) = -s(index,:);
+
+x = zeros(1,m);
+C = [c x];
+disp(C);
+
+Mat = array2table(C);
+
+Mat.Properties.VariableNames(1:size(C,2)) = {'x1','x2','s1','s2','s3'};
+
+A = [A s b];
+
+std_form = array2table(A);
+std_form.Properties.VariableNames(1:n+m+1) = {'x1','x2','s1','s2','s3','b'};
+disp(Mat);
+disp(std_form);
