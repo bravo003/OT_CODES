@@ -1,0 +1,84 @@
+clc;
+close all;
+C = [5 4]; %cost or objective function
+A = [4 1; 2 3;1 0;0 1]; %constraint coefficients
+B = [40;90;0;0]; 
+
+y1 = 0:0.1:max(B); %all points are included last walla bhi.
+
+x21 = (B(1) - A(1,1)*y1)/A(1,2); %value of x2
+x22 = (B(2) - A(2,1)*y1)/A(2,2);
+% x23 = (B(3) - A(3,1)*y1)/A(3,2);
+
+x21 = max(0,x21); %and this value of 0 it can be 1 also as it depends on the domain.
+x22 = max(0,x22); %to delete the negative values
+%x23 = max(0,x23);
+
+plot (y1,x21, 'r', y1,x22,'k');
+
+xlabel('Value of x1');
+ylabel('Value of x2');
+
+legend('x1, x21' , 'x2 , x22');
+grid on
+
+%INTERSECTION
+sol = [0 ;0];
+
+for i=1:length(A) %length is the no. of constraints like if 3 toh 3 nhi toh jo give hooo return joo badaaa
+    a1 = A(i,:);
+    b1 = B(i,:);
+    for j = i+1:length(A)
+        a2 = A(j,:);
+        b2 = B(j,:);
+        
+        a3 = [a1;a2];
+      
+        b3 = [b1;b2];
+        
+        X = a3\b3; %to find all the points
+
+        sol = [sol X]; % to store all the points
+    end
+end
+
+
+%next step to find points which are not in feasible region and remove them 
+x1 = sol(1,:);
+x2 = sol(2,:);
+y1 = find(4*x1 + 1*x2 < 40);%ulta karna 
+sol(:,y1)=[];
+
+x1 = sol(1,:);
+x2 = sol(2,:);
+y2 = find(2*x1+3*x2 < 90);
+sol(:,y2)=[];
+
+% x1 = sol(1,:);
+% x2 = sol(2,:);
+% y3 = find(1*x2 < 600);
+% sol(:,y3)=[];
+
+x1 = sol(1,:);
+x2 = sol(2,:);
+y3 = find(x1<0);
+sol(:,y3)=[];
+
+x1 = sol(1,:);
+x2 = sol(2,:);
+y4 = find(x2<0);
+sol(:,y4)=[];
+
+x1 = sol(1,:);
+x2 = sol(2,:);
+x1;
+x2;
+ip=[];
+sol = sol';
+for i=1:length(sol)
+     ip(i,:) = sum(sol(i,:).*C)
+end
+[p,loc]=max(ip);
+fprintf('The Optimal Value is %f\n',p);
+fprintf('the optimal solution is');
+disp(sol(loc,:));
