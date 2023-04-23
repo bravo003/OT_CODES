@@ -1,0 +1,96 @@
+clc;
+clear all;
+
+A = [3 1 0 0 1 0 3;
+     4 3 -1 0 0 1 6;
+     1 2 0 1 0 0 3];
+
+variables = ["X1","X2","S2","S3","A1","A2","Sol"];
+M = 1000;
+
+Z = [-2 -1 0 0 -M -M 0];
+
+
+[m,n] = size(A);
+
+s=eye(m);
+
+BV =[];
+
+for i=1:size(s,2)
+    for j=1:size(A,2)
+        if A(:,j)==s(:,i)
+            BV = [BV j];
+        end
+    end
+end
+
+fprintf("Basisc variables: \n");
+disp(variables(BV));
+
+run = true;
+
+while run
+    ZjCj = Z(BV)*A - Z;
+    table = [A;ZjCj];
+
+    simplextable = array2table(table);
+    simplextable.Properties.VariableNames(1:size(simplextable,2))= variables;
+    disp(simplextable);
+    
+    zc = ZjCj(1:end-1);
+    if any (zc<0)
+        fprintf("The Current BFS is not optimal \n");
+
+         %sol walla column nhi legga idhar
+          [Enter_val, pvt_col] = min(zc);
+           fprintf("Entering Column is %d \n",pvt_col);
+
+    if all (A(:,pvt_col)<=0)
+        fprintf("LPP is Unbounded all entries are <=0 in column %d",pvt_col);
+    else
+        sol = A(:,end);
+        column = A(:,pvt_col);
+        for i = 1:m
+            if column(i) > 0
+                ratio(i) = sol(i)./column(i);
+            else
+                ratio(i) = inf;
+            end
+        end
+
+        [leaving_val, pvt_row] = min(ratio);
+    end
+ fprintf("Leaving Row is %d \n",pvt_row);
+    BV(pvt_row) = pvt_col;
+
+    fprintf("New Basic variables: \n");
+        disp(variables(BV));
+        
+    pvt_key = A(pvt_row, pvt_col);
+
+    A(pvt_row,:) = A(pvt_row,:)./pvt_key;
+
+    for i = 1:m
+        if (i~=pvt_row)
+            A(i,:) = A(i,:) - A(i, pvt_col).*A(pvt_row,:);
+        end
+    end
+
+    ZjCj = Z(BV)*A - Z;
+
+    else
+        run = false;
+        fprintf("Current BFS is Optimal \n");
+    end
+end
+
+
+
+
+
+
+
+
+    
+
